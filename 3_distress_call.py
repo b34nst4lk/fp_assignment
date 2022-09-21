@@ -1,8 +1,8 @@
 from typing import List
 
-from google.cloud import bigquery
-from google.oauth2 import service_account
+from google.cloud.bigquery import QueryJobConfig, Row, ScalarQueryParameter
 
+from base_job import BaseJob
 
 DISTRESS_CALL = """
     SELECT
@@ -21,22 +21,18 @@ DISTRESS_CALL = """
     ORDER BY
         distance_in_meters ASC
     LIMIT
-        20;
-
+        5;
 """
 
 
-class Job:
-    def __init__(self, client: bigquery.Client):
-        self.client = client
-
+class Job(BaseJob):
     def retrieve_port_closest_to_distress_call(
         self, lat: float, lng: float
-    ) -> List[bigquery.Row]:
+    ) -> List[Row]:
         point = f"POINT({lng} {lat})"
-        job_config = bigquery.QueryJobConfig(
+        job_config = QueryJobConfig(
             query_parameters=[
-                bigquery.ScalarQueryParameter("point", "STRING", point),
+                ScalarQueryParameter("point", "STRING", point),
             ],
         )
 
@@ -46,12 +42,7 @@ class Job:
 
 
 def main():
-    credentials = service_account.Credentials.from_service_account_file(
-        "./key.json", scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    client = bigquery.Client(credentials=credentials, project=credentials.project_id)
-
-    job = Job(client)
+    job = Job()
     rows = job.retrieve_port_closest_to_distress_call(32.610982, -38.706256)
     first_row = rows[0]
     print(

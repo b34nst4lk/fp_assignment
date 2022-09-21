@@ -1,8 +1,8 @@
 from typing import List
 
-from google.cloud import bigquery
-from google.oauth2 import service_account
+from google.cloud.bigquery import QueryJobConfig, Row, ScalarQueryParameter
 
+from base_job import BaseJob
 
 QUERY_INDEX_NUMBER_AND_PORT_GEOM_BY_PORT_NAME = """
     SELECT
@@ -30,16 +30,11 @@ QUERY_FOR_NEAREST_PORTS_TO_PORT = """
 """
 
 
-class Job:
-    def __init__(self, client: bigquery.Client):
-        self.client = client
-
-    def retrieve_index_number_and_port_geom_by_port_name(
-        self, port_name: str
-    ) -> bigquery.Row:
-        job_config = bigquery.QueryJobConfig(
+class Job(BaseJob):
+    def retrieve_index_number_and_port_geom_by_port_name(self, port_name: str) -> Row:
+        job_config = QueryJobConfig(
             query_parameters=[
-                bigquery.ScalarQueryParameter("port_name", "STRING", port_name),
+                ScalarQueryParameter("port_name", "STRING", port_name),
             ],
         )
         query_job = self.client.query(
@@ -53,15 +48,11 @@ class Job:
 
         return rows[0]
 
-    def retrieve_nearest_ports(
-        self, port_index_number: str, point: str
-    ) -> List[bigquery.Row]:
-        job_config = bigquery.QueryJobConfig(
+    def retrieve_nearest_ports(self, port_index_number: str, point: str) -> List[Row]:
+        job_config = QueryJobConfig(
             query_parameters=[
-                bigquery.ScalarQueryParameter(
-                    "index_number", "STRING", port_index_number
-                ),
-                bigquery.ScalarQueryParameter("point", "STRING", point),
+                ScalarQueryParameter("index_number", "STRING", port_index_number),
+                ScalarQueryParameter("point", "STRING", point),
             ],
         )
         query_job = self.client.query(QUERY_FOR_NEAREST_PORTS_TO_PORT, job_config)
@@ -70,12 +61,7 @@ class Job:
 
 
 def main():
-    credentials = service_account.Credentials.from_service_account_file(
-        "./key.json", scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    client = bigquery.Client(credentials=credentials, project=credentials.project_id)
-
-    job = Job(client)
+    job = Job()
     row = job.retrieve_index_number_and_port_geom_by_port_name("JURONG ISLAND")
     nearest_ports = job.retrieve_nearest_ports(row.index_number, row.port_geom)
     for port in nearest_ports:
