@@ -51,9 +51,12 @@ clicking on Postman to fire a request, or running a process and checking the dat
 for the result by hand. Automated testing formalizes as much of that as possible
 in code.
 
-There are also different levels of testing. At the very bottom, we test if an 
+There are also different levels of testing. At the very bottom, we test the 
 interface that a user (in this case a developer), such as a function, can interact
-with. 
+with. At each level up beyond the first, we test the behavior of interactions of the 
+parts below the first. At the very top, testing essentially covers everything from
+the start of a use case from the end-users' perspectives, and the comparing the results
+with the expected outcome.
 
 ### When should you test?
 
