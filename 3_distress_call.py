@@ -1,5 +1,7 @@
+import logging
 from typing import List
 
+from psycopg2 import sql
 from google.cloud.bigquery import (
     QueryJobConfig,
     Row,
@@ -8,33 +10,7 @@ from google.cloud.bigquery import (
     Table,
 )
 
-from base_job import BaseETLJob
-
-PROJECT_ID = "silicon-glyph-363112"
-DATASET = "foodpanda_exercise"
-INPUT_TABLE_NAME = "world_port_index"
-
-DISTRESS_CALL = """
-    SELECT
-        country,
-        port_name,
-        port_latitude,
-        port_longitude,
-        ST_DISTANCE(ST_GEOGFROMTEXT(@point), port_geom) AS distance_in_meters
-    FROM
-        `foodpanda_exercise.world_port_index`
-    WHERE
-        provisions is TRUE
-        AND water is TRUE
-        AND fuel_oil is TRUE
-        AND diesel is TRUE
-    ORDER BY
-        distance_in_meters ASC
-    LIMIT
-        1;
-"""
-
-TABLE_ID = "distress_call"
+from base_job import BaseETLJob, parse_args
 
 TABLE_SCHEMA = [
     SchemaField("country", "STRING", mode="required"),
@@ -45,10 +21,8 @@ TABLE_SCHEMA = [
 
 
 class Job(BaseETLJob):
-    OUTPUT_TABLE_NAME = f"{PROJECT_ID}.{DATASET}.{TABLE_ID}"
-
-    def __init__(self, lat, lng):
-        super().__init__()
+    def __init__(self, lat, lng, **kwargs):
+        super().__init__(**kwargs)
         self.lat = lat
         self.lng = lng
 
@@ -64,13 +38,34 @@ class Job(BaseETLJob):
             for row in rows
         ]
 
-    def load(self, rows: List[dict]):
+    def load(self, rows: List[dict]) -> List[dict]:
         self.create_table()
         self.insert_rows(rows)
+        return rows
 
     def retrieve_port_closest_to_distress_call(
         self, lat: float, lng: float
     ) -> List[Row]:
+        DISTRESS_CALL = f"""
+            SELECT
+                country,
+                port_name,
+                port_latitude,
+                port_longitude,
+                ST_DISTANCE(ST_GEOGFROMTEXT(@point), port_geom) AS distance_in_meters
+            FROM
+                `{sql.Identifier(self.input_table_name).string}`
+            WHERE
+                provisions is TRUE
+                AND water is TRUE
+                AND fuel_oil is TRUE
+                AND diesel is TRUE
+            ORDER BY
+                distance_in_meters ASC
+            LIMIT
+                1;
+        """
+
         point = f"POINT({lng} {lat})"
         job_config = QueryJobConfig(
             query_parameters=[
@@ -90,10 +85,21 @@ class Job(BaseETLJob):
         self.client.insert_rows_json(self.output_table_name, rows)
 
 
-
 def main():
+    arguments = parse_args(
+        description="This job searches for the country with the most number of ports with cargo wharves, and creates an output job table on BigQuery"
+    )
+    if not arguments:
+        return
+
     lat, lng = (32.610982, -38.706256)
-    Job(lat, lng).execute()
+    results = Job(lat, lng, **arguments).execute()
+    logging.info("country, port_name, port_latitude, port_longitude")
+    for result in results:
+        logging.info(
+            f"{result['country']}, {result['port_name']}, {result['port_latitude']}, {result['port_longitude']}"
+        )
+
 
 if __name__ == "__main__":
     main()
