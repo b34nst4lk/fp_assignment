@@ -1,0 +1,4 @@
+google==3.0.0
+google-cloud-bigquery==3.3.2
+grpcio-status==1.48.1
+psycopg2==2.9.3
