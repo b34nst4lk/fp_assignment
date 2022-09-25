@@ -12,7 +12,7 @@ from psycopg2 import sql
 
 from base_job import BaseETLJob, parse_args
 
-TABLE_SCHEMA = [
+OUTPUT_TABLE_SCHEMA = [
     SchemaField("country", "STRING", mode="required"),
     SchemaField("port_name", "STRING", mode="required"),
     SchemaField("port_latitude", "FLOAT64", mode="required"),
@@ -78,7 +78,7 @@ class Job(BaseETLJob):
         return rows
 
     def create_table(self):
-        table = Table(self.output_table_name, schema=TABLE_SCHEMA)
+        table = Table(self.output_table_name, schema=OUTPUT_TABLE_SCHEMA)
         self.client.create_table(table)
 
     def insert_rows(self, rows: List[Row]):
