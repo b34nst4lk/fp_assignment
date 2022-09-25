@@ -15,7 +15,7 @@ The top level folder is structured as such.
 ├── LICENSE
 ├── pyproject.toml
 ├── README.md
-├── scripts
+├── scripts             # Utility scripts for testing, building and publishing the library and documentation
 ├── SECURITY.md
 ├── tags
 └── tests               # test cases for fastapi
