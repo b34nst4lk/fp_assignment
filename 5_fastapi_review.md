@@ -1,9 +1,13 @@
 # FastAPI
 
+## Introduction
+
 FastAPI is a web framework built upon Starlette and Pydantic. As it is a library 
 intended to be packaged and served from repositories like PyPI, the top level 
 folder contains the module itself (named `fastapi`) and all support tests and 
 documentation.
+
+## Starting at the top
 
 The top level folder is structured as such.
 ```
@@ -17,20 +21,19 @@ The top level folder is structured as such.
 ├── README.md
 ├── scripts             # Utility scripts for testing, building and publishing the library and documentation
 ├── SECURITY.md
-├── tags
 └── tests               # test cases for fastapi
 ``` 
 
 When the library is installed by a user, only the `fastapi` folder is actually 
 installed. 
 
-## docs and docs_src
+### docs and docs_src
 
 Both modules combined together provide the documentation in various languages
 and the code examples used. Code examples are written in code and not within
 the documentation itself so that they can be tested.
 
-## tests
+### tests
 
 Tests are broken down into individual use cases. For example, tests related to 
 how path params are handled are stored in `test_path.py`. The reason would
@@ -38,7 +41,7 @@ likely be to ensure that the use cases a user may require is grouped together
 so that they are easy to find.
 
 
-## fastapi module
+### fastapi module
 
 Within the fastapi module, we have the following submodules,
 ```
