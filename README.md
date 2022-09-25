@@ -32,7 +32,3 @@ and `port_longitude` only.
  
 5. Have a browse of https://github.com/tiangolo/fastapi and write down how this 
    repository is structured and why. What improvements do you think can be made?
-
-Notes:
-- Followed the instructions here to setup bigquery service account https://codelabs.developers.google.com/codelabs/cloud-bigquery-python#0
-- Copied the `geo_international_ports.world_ports` table to personal project
