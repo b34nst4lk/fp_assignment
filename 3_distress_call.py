@@ -1,7 +1,6 @@
 import logging
 from typing import List
 
-from psycopg2 import sql
 from google.cloud.bigquery import (
     QueryJobConfig,
     Row,
@@ -9,6 +8,7 @@ from google.cloud.bigquery import (
     SchemaField,
     Table,
 )
+from psycopg2 import sql
 
 from base_job import BaseETLJob, parse_args
 
