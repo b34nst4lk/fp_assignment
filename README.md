@@ -12,16 +12,19 @@
 ## Questions
 
 1. What are the 5 nearest ports closest to Singapore's *JURONG ISLAND* port?
+
 Note: Answer should include the columns `port_name` and `distance_in_meters` 
 only.
  
 2. Which country has the largest number of ports with a `cargo_wharf`? 
+
 Note: Answer should include the columns `country` and `port_count` only.
 
 3. You receive a distress call from the middle of the North Atlantic Ocean. The 
    person on the line gave you a coordinates of `lat: 32.610982`, 
    `long: -38.706256` and asked for the nearest port with `provisions`, 
    `water`, `fuel_oil` and `diesel`. 
+
 Note: Answer should include the columns `country`, `port_name`, `port_latitude` 
 and `port_longitude` only.
 
